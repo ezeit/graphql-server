@@ -21,7 +21,7 @@
   "scripts": {
     "dev": "npm-run-all --parallel dev:*",
     "dev:api": "nodemon --exec babel-node index.js",
-    "dev:json": "json-server --watch db.json"
+    "dev:json": "json-server --watch ./src/data/local/db.json"
   },
   "repository": {
     "type": "git",
