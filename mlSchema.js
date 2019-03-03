@@ -5,9 +5,23 @@ export const typeDefs = gql`
   type Item {
     id: ID
     title: String
-    price: Int
+    price: Float
     currency_id: String
     thumbnail: String
+    available_quantity: Int
+    sold_quantity: Int
+    buying_mode: String
+    listing_type_id: String
+    condition: String
+    accepts_mercadopago: Boolean
+    shipping: Shipping
+  }
+
+  type Shipping {
+    free_shipping: Boolean
+    mode: String    
+    logistic_type : String
+    store_pick_up : Boolean
   }
 
     type PageInfo {
