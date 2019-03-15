@@ -33,76 +33,58 @@ export const typeDefs = gql`
         pageInfo: PageInfo!
         totalCount: Int!
     }
+    
     type Query {
-        search(
-        query: String
-        before: String
-        after: String
-        first: Int,
-        ): SearchResult
-    }
+      search(
+      query: String      
+      page: Int,
+      order: String
+      ): SearchResult
+  }
 
 `
 
 export const resolvers = {
-    Query: {
-    //   users() {
-    //     return userModel.list()
-    //   },
-    search :async  (_, {query, before, after, first }) => {
-        if (first < 0) {
-          throw new Error('First must be positive');
-        }
-        let data  = await mlModel.search(query);        
-        const totalCount = data.results.length;  
-        let todos = [];
-        let start = 0;
-        if (after !== undefined) {          
-          const id = Buffer.from(after, 'base64').toString('ascii')    
-          const index = data.results.findIndex((todo) => todo.id === id);
-          if (index === -1)           
-            throw new Error('After does not exist');
-
-          start = index + 1;          
-        }else if(before != undefined){      
-          const id = Buffer.from(before, 'base64').toString('ascii')    
-          const index = data.results.findIndex((todo) => todo.id === id);
-          if (index === -1)           
-            throw new Error('Before does not exist');
-                
-          start = index - 9;
-        }
-
-
-        todos = first === undefined ?
-          data.results :
-          data.results.slice(start, start + first);
-        let endCursor;
-        const items = todos.map((todo) => {
-            endCursor = Buffer.from(todo.id).toString('base64');          
-        //   return ({
-        //     cursor: endCursor,
-        //     node: todo,
-        //   });        
-        return todo;
+  Query: {
+    search: async (_, { query, page, order }) => {
+      page = page - 1 || 0
+      let data = await mlModel.search(query);
+      const totalCount = data.results.length;
+      if (order === 'DESC') {
+        data.results.sort(function (a, b) {          
+          if (a.title.trim() > b.title.trim()) {
+            return -1;
+          }
+          if (a.title.trim() < b.title.trim()) {
+            return 1;
+          }
+          return 0;
         });
-        const hasNextPage = start + first < totalCount;
-        const pageInfo = endCursor !== undefined ?
-          {
-            endCursor,
-            hasNextPage,
-          } :
-          {
-            hasNextPage,
-          };
-        const result = {
-          items,
-          pageInfo,
-          totalCount,
-        };
-        return result;
+      } else {
+        data.results.sort(function (a, b) {
+          if (a.title.trim() > b.title.trim()) {
+            return 1;
+          }
+          if (a.title.trim() < b.title.trim()) {
+            return -1;
+          }
+          return 0;
+        });
       }
+      const items = data.results.slice(5 * page, 5 * page + 5);
+      const hasNextPage = 5 * page + 5 < totalCount;
+      const pageInfo =
+      {
+        hasNextPage,
+      };
+      const result = {
+        items,
+        pageInfo,
+        totalCount,
+      };
+      return result;
     }
   }
+}
 
 
