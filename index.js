@@ -1,6 +1,5 @@
 import express from 'express'
 import { ApolloServer } from 'apollo-server-express'
-// import { resolvers, typeDefs } from './schema'
 import { resolvers, typeDefs } from './src/data/mercadolibre/mlSchema'
 import cors from 'cors'
 

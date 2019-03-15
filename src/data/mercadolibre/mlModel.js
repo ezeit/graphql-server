@@ -1,4 +1,3 @@
-import sizeof from 'sizeof'
 import fetch from 'node-fetch'
 
 class MLItem {
